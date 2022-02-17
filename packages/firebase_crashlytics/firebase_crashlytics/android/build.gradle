@@ -12,15 +12,24 @@ buildscript {
   }
 }
 
+def firebaseCrashlyticsAndroidLibPath = "${project.projectDir}/libs"
+def firebaseCrashlyticsAndroidLibVersion = "18.2.5-SNAPSHOT"
+ext {
+  firebaseCrashlyticsAndroidLibPath = firebaseCrashlyticsAndroidLibPath
+  firebaseCrashlyticsAndroidLibVersion = firebaseCrashlyticsAndroidLibVersion
+}
+
 rootProject.allprojects {
   repositories {
     google()
     mavenCentral()
+    maven {
+      url firebaseCrashlyticsAndroidLibPath
+    }
   }
 }
 
 apply plugin: 'com.android.library'
-
 def firebaseCoreProject = findProject(':firebase_core')
 if (firebaseCoreProject == null) {
   throw new GradleException('Could not find the firebase_core FlutterFire plugin, have you added it as a dependency in your pubspec?')
@@ -33,6 +42,8 @@ def getRootProjectExtOrCoreProperty(name, firebaseCoreProject) {
   if (!rootProject.ext.get('FlutterFire')[name]) return firebaseCoreProject.properties[name]
   return rootProject.ext.get('FlutterFire').get(name)
 }
+
+
 
 android {
   compileSdkVersion 31
@@ -51,8 +62,12 @@ android {
 }
 
 dependencies {
-  implementation platform("com.google.firebase:firebase-bom:${getRootProjectExtOrCoreProperty("FirebaseSDKVersion", firebaseCoreProject)}")
-  implementation 'com.google.firebase:firebase-crashlytics'
+  // TODO remove once SDK published
+  implementation(group: 'com.google.firebase', name:'firebase-crashlytics', version: firebaseCrashlyticsAndroidLibVersion)
+  // TODO re-add once SDK published
+  // implementation platform("com.google.firebase:firebase-bom:${getRootProjectExtOrCoreProperty("FirebaseSDKVersion", firebaseCoreProject)}")
+  // implementation 'com.google.firebase:firebase-crashlytics'
+
   implementation 'androidx.annotation:annotation:1.1.0'
 }
 
